@@ -1,6 +1,6 @@
 import { jsxDEV } from "react/jsx-dev-runtime";
 import React, { useEffect, useRef, useState } from "react";
-import { useCurrentFrame, useVideoConfig, interpolate } from "remotion";
+import { useCurrentFrame, useVideoConfig, interpolate, Easing } from "remotion";
 import * as THREE from "three";
 import { loadMaterials } from "./materials.js";
 import { setupLighting, createEnvironment } from "./environment.js";
@@ -39,7 +39,9 @@ const KitchenSceneCanvas = () => {
     const renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: true,
-      preserveDrawingBuffer: true
+      preserveDrawingBuffer: true,
+      powerPreference: "high-performance"
+      // Hint for better GPU usage
     });
     renderer.setPixelRatio(1);
     renderer.setSize(width, height, false);
@@ -50,7 +52,7 @@ const KitchenSceneCanvas = () => {
     canvas.style.width = "100%";
     canvas.style.height = "100%";
     const { scene, camera, waterSystem, faucetTip, glassMesh } = createKitchenScene(width, height);
-    const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(512, {
+    const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(256, {
       generateMipmaps: true,
       minFilter: THREE.LinearMipmapLinearFilter,
       magFilter: THREE.LinearFilter
@@ -59,7 +61,7 @@ const KitchenSceneCanvas = () => {
     if (glassMesh) {
       cubeCamera.position.copy(glassMesh.position);
       glassMesh.material.envMap = cubeRenderTarget.texture;
-      glassMesh.material.envMapIntensity = 1;
+      glassMesh.material.envMapIntensity = 1.2;
       glassMesh.material.needsUpdate = true;
     }
     scene.add(cubeCamera);
@@ -84,20 +86,23 @@ const KitchenSceneCanvas = () => {
     const scene = sceneRef.current;
     const camera = cameraRef.current;
     const t = durationInFrames > 0 ? frame / durationInFrames : 0;
-    const x = interpolate(t, [0, 0.4, 1], [3, 1.5, -1.8]);
-    const y = interpolate(t, [0, 0.2, 1], [1.5, 3.5, 3]);
-    const z = interpolate(t, [0, 0.3, 1], [5.5, 7, 9]);
+    const smoothT = interpolate(t, [0, 1], [0, 1], {
+      easing: Easing.bezier(0.45, 0, 0.55, 1)
+    });
+    const x = interpolate(smoothT, [0, 0.4, 1], [3, 1.5, -1.8]);
+    const y = interpolate(smoothT, [0, 0.2, 1], [1.5, 3.5, 3]);
+    const z = interpolate(smoothT, [0, 0.3, 1], [5.5, 7, 9]);
     const lookX = 0;
-    const lookY = interpolate(t, [0, 1], [-0.35, -0.05]);
+    const lookY = interpolate(smoothT, [0, 1], [-0.35, -0.05]);
     const lookZ = 0;
-    const shake = Math.sin(frame * 0.05) * 5e-3;
+    const shake = Math.sin(frame * 0.05) * 2e-3;
     camera.position.set(x, y + shake, z);
     camera.lookAt(lookX, lookY, lookZ);
     const { waterSystem, faucetTip, glassMesh } = scene.userData;
     if (waterSystem && faucetTip) {
       waterSystem.update(frame, fps, faucetTip);
     }
-    if (cubeCameraRef.current && glassMesh && renderer) {
+    if (cubeCameraRef.current && glassMesh && renderer && frame % 2 === 0) {
       glassMesh.visible = false;
       cubeCameraRef.current.update(renderer, scene);
       glassMesh.visible = true;
@@ -118,7 +123,7 @@ const KitchenSceneCanvas = () => {
     false,
     {
       fileName: "<stdin>",
-      lineNumber: 159,
+      lineNumber: 168,
       columnNumber: 5
     }
   );
@@ -146,7 +151,10 @@ const KitchenSceneStandalone = () => {
     canvas.style.width = "100%";
     canvas.style.height = "100%";
     const { scene, camera, waterSystem, faucetTip, glassMesh } = createKitchenScene(clientWidth, clientHeight);
-    const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(512, { generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter });
+    const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(256, {
+      generateMipmaps: true,
+      minFilter: THREE.LinearMipmapLinearFilter
+    });
     const cubeCamera = new THREE.CubeCamera(0.1, 50, cubeRenderTarget);
     if (glassMesh) {
       cubeCamera.position.copy(glassMesh.position);
@@ -170,6 +178,7 @@ const KitchenSceneStandalone = () => {
       const scene2 = sceneRef.current;
       const camera2 = cameraRef.current;
       const t = durationFrames > 0 ? frame % durationFrames / durationFrames : 0;
+      const smoothT = t;
       const x = interpolate(t, [0, 0.4, 1], [3, 1.5, -1.8]);
       const y = interpolate(t, [0, 0.2, 1], [1.5, 3.5, 3]);
       const z = interpolate(t, [0, 0.3, 1], [5.5, 7, 9]);
@@ -183,7 +192,7 @@ const KitchenSceneStandalone = () => {
       if (waterSystem2 && faucetTip2) {
         waterSystem2.update(frame, fps, faucetTip2);
       }
-      if (cubeCameraRef.current && glassMesh2) {
+      if (cubeCameraRef.current && glassMesh2 && frame % 2 === 0) {
         glassMesh2.visible = false;
         cubeCameraRef.current.update(renderer2, scene2);
         glassMesh2.visible = true;
@@ -229,7 +238,7 @@ const KitchenSceneStandalone = () => {
     false,
     {
       fileName: "<stdin>",
-      lineNumber: 292,
+      lineNumber: 306,
       columnNumber: 5
     }
   );

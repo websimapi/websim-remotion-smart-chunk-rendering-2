@@ -1,40 +1,41 @@
 import * as THREE from "three";
 
 export const setupLighting = (scene) => {
-  const ambient = new THREE.AmbientLight(0x404040, 0.5); 
+  const ambient = new THREE.AmbientLight(0x404040, 0.6); // Slightly brighter ambient
   scene.add(ambient);
 
-  // Sunlight - Positioned to match the reference image (coming from left-outdoors)
-  const sunLight = new THREE.DirectionalLight(0xfffaf0, 4.5); 
-  sunLight.position.set(-5, 6, -6); 
-  sunLight.target.position.set(2, 0, 2); 
+  // Sunlight - Adjusted to cast strong diagonal shadows through the window frames
+  // Positioned lower and more "behind" the window to throw shadows across the sink
+  const sunLight = new THREE.DirectionalLight(0xfff5e6, 5.0); 
+  sunLight.position.set(-3, 5, -8); // Moved further back (Z) and adjusted angle
+  sunLight.target.position.set(1, -0.5, 1); // Target the sink area
   sunLight.castShadow = true;
   sunLight.shadow.mapSize.width = 2048;
   sunLight.shadow.mapSize.height = 2048;
   sunLight.shadow.bias = -0.0005;
-  sunLight.shadow.normalBias = 0.03; // Helps with self-shadowing acne/peter-panning
-  sunLight.shadow.camera.near = 0.5;
-  sunLight.shadow.camera.far = 20;
-  sunLight.shadow.camera.left = -5;
-  sunLight.shadow.camera.right = 5;
-  sunLight.shadow.camera.top = 5;
-  sunLight.shadow.camera.bottom = -5;
+  sunLight.shadow.normalBias = 0.02; 
+  sunLight.shadow.camera.near = 1;
+  sunLight.shadow.camera.far = 30;
+  // Tighten shadow camera for sharper shadows
+  sunLight.shadow.camera.left = -8;
+  sunLight.shadow.camera.right = 8;
+  sunLight.shadow.camera.top = 8;
+  sunLight.shadow.camera.bottom = -8;
   scene.add(sunLight);
   scene.add(sunLight.target);
 
-  // Window Fill
-  const windowFill = new THREE.SpotLight(0xddeeff, 2, 15, Math.PI / 3, 0.5, 1);
-  windowFill.position.set(0, 3, -1.8); 
+  // Window Fill - Cool blue skylight fill
+  const windowFill = new THREE.SpotLight(0xcceeff, 2.5, 20, Math.PI / 3, 0.5, 1);
+  windowFill.position.set(0, 4, -3); 
   windowFill.target.position.set(0, 0, 2);
   scene.add(windowFill);
   scene.add(windowFill.target);
 
   // Interior Ceiling Light - Warm top light
-  const ceilingLight = new THREE.PointLight(0xffeedd, 1.5, 12);
+  const ceilingLight = new THREE.PointLight(0xffeedd, 1.0, 12);
   ceilingLight.position.set(0, 3.2, 3);
   ceilingLight.castShadow = true;
-  ceilingLight.shadow.bias = -0.0005;
-  ceilingLight.shadow.normalBias = 0.02;
+  ceilingLight.shadow.bias = -0.0001;
   scene.add(ceilingLight);
 };
 

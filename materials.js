@@ -91,10 +91,13 @@ export const loadMaterials = () => {
     color: 0xffffff,
     metalness: 0.0,
     roughness: 0.0, 
-    transmission: 1.0, 
-    thickness: 0.0,     // Set to 0 to prevent physical absorption tinting
-    ior: 1.5,          
-    envMapIntensity: 2.0, 
+    transmission: 1.0,  
+    thickness: 0.05,    // Physical thickness for refraction
+    ior: 1.52,          // Realistic glass IOR
+    reflectivity: 0.5,
+    clearcoat: 1.0,     // Sharp surface reflections
+    clearcoatRoughness: 0.0,
+    envMapIntensity: 3.0, 
     transparent: true,
     opacity: 1.0,
     side: THREE.DoubleSide,

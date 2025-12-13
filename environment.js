@@ -2,61 +2,47 @@ import * as THREE from "three";
 
 export const setupLighting = (scene) => {
   // 1. Hemisphere Light - Atmosphere
-  // Increased brightness and neutralized colors to fix "incorrect" baked look and dark shadows
-  const hemiLight = new THREE.HemisphereLight(0xffffff, 0x666666, 1.2);
+  // Drastically reduced to simulate a dark interior lit predominantly by the window
+  const hemiLight = new THREE.HemisphereLight(0x222222, 0x050505, 0.2);
   scene.add(hemiLight);
 
   // 2. Sunlight - Key Light
-  // Strong, directional, casting hard shadows through the window
-  const sunLight = new THREE.DirectionalLight(0xffffff, 3.5);
-  // Position: Higher up as requested (8, 10, -5) to simulate mid-day sun
-  sunLight.position.set(8, 10, -5); 
-  // Target: Center of the kitchen floor area
-  sunLight.target.position.set(-1, 0, 2);
+  // Bright, directional sunlight entering through the window
+  const sunLight = new THREE.DirectionalLight(0xfff5e6, 6.0);
+  sunLight.position.set(5, 8, -6); 
+  sunLight.target.position.set(0, 0, 4);
   sunLight.castShadow = true;
 
-  // High quality shadow properties
-  sunLight.shadow.mapSize.width = 2048; // Balanced for performance
-  sunLight.shadow.mapSize.height = 2048;
-  sunLight.shadow.bias = -0.0005; // Fix acne
-  sunLight.shadow.normalBias = 0.02;
-  sunLight.shadow.radius = 2; // Slight softness
+  // Ultra-high quality shadow settings for crisp window frame projection
+  sunLight.shadow.mapSize.width = 4096; 
+  sunLight.shadow.mapSize.height = 4096;
+  sunLight.shadow.bias = -0.0001; 
+  sunLight.shadow.normalBias = 0.01;
+  sunLight.shadow.radius = 1; 
   
-  // Tight frustum for sharper shadows in the kitchen area
   sunLight.shadow.camera.near = 1;
-  sunLight.shadow.camera.far = 40;
-  sunLight.shadow.camera.left = -8;
-  sunLight.shadow.camera.right = 8;
-  sunLight.shadow.camera.top = 8;
-  sunLight.shadow.camera.bottom = -8;
+  sunLight.shadow.camera.far = 50;
+  sunLight.shadow.camera.left = -10;
+  sunLight.shadow.camera.right = 10;
+  sunLight.shadow.camera.top = 10;
+  sunLight.shadow.camera.bottom = -10;
   
   scene.add(sunLight);
   scene.add(sunLight.target);
 
-  // 3. Window Area Light (Simulated Bounce)
-  // Changed from blue (0xddeeff) to white (0xffffff) to remove "blue glass effect"
-  const skyFill = new THREE.PointLight(0xffffff, 2.0, 15);
-  skyFill.position.set(0, 2, -1);
-  skyFill.decay = 2;
+  // 3. Sky Portal Light 
+  // Simulates diffuse skylight coming specifically from the window opening
+  // No internal ceiling light is added, ensuring light comes ONLY from the window direction
+  const skyFill = new THREE.SpotLight(0xddeeff, 10.0);
+  skyFill.position.set(0, 2.0, -2.5); // Outside window
+  skyFill.target.position.set(0, 1.0, 5.0); // Pointing deep into room
+  skyFill.angle = Math.PI / 1.5;
+  skyFill.penumbra = 1.0;
+  skyFill.decay = 1.5;
+  skyFill.distance = 30;
+  skyFill.castShadow = false; // Soft fill only, no shadows
   scene.add(skyFill);
-
-  // 4. Interior Ceiling Light
-  // Warm, overhead light for specular highlights and mixed color temps
-  const ceilingLight = new THREE.SpotLight(0xffeeb1, 10.0);
-  ceilingLight.position.set(0, 3.4, 4); // Centered in the walkable area
-  ceilingLight.target.position.set(0, 0, 4);
-  ceilingLight.angle = Math.PI / 3;
-  ceilingLight.penumbra = 0.5;
-  ceilingLight.decay = 2.0;
-  ceilingLight.distance = 15;
-  
-  ceilingLight.castShadow = true;
-  ceilingLight.shadow.bias = -0.0001;
-  ceilingLight.shadow.mapSize.width = 1024;
-  ceilingLight.shadow.mapSize.height = 1024;
-  
-  scene.add(ceilingLight);
-  scene.add(ceilingLight.target);
+  scene.add(skyFill.target);
 };
 
 export const createEnvironment = (scene, materials) => {
@@ -103,9 +89,13 @@ export const createEnvironment = (scene, materials) => {
   scene.add(rightFrame);
 
   // Glass
+  // castShadow must be false for light to pass through the mesh physically
+  // while keeping transmission enabled for visual distortion/reflection
   const glassGeo = new THREE.BoxGeometry(windowWidth, windowHeight, 0.02);
   const glass = new THREE.Mesh(glassGeo, glassMat);
   glass.position.set(0, 1.5, windowZ);
+  glass.castShadow = false;
+  glass.receiveShadow = true;
   scene.add(glass);
 
   // Outdoor View
@@ -229,29 +219,7 @@ export const createEnvironment = (scene, materials) => {
   ceiling.receiveShadow = true;
   scene.add(ceiling);
 
-  // Ceiling Light Fixture
-  const fixtureGroup = new THREE.Group();
-  fixtureGroup.position.set(0, ceilingY - 0.05, 4); // Match light position from setupLighting
-  
-  const fixtureBase = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.4, 0.4, 0.1, 32),
-    new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.5, roughness: 0.5 })
-  );
-  fixtureGroup.add(fixtureBase);
-  
-  const fixtureBulb = new THREE.Mesh(
-    new THREE.SphereGeometry(0.25, 32, 16),
-    new THREE.MeshStandardMaterial({ 
-        color: 0xffffee, 
-        emissive: 0xffaa77, 
-        emissiveIntensity: 2.0,
-        toneMapped: false 
-    })
-  );
-  fixtureBulb.position.y = -0.1;
-  fixtureGroup.add(fixtureBulb);
-  
-  scene.add(fixtureGroup);
+
 
   // Floor
   const floor = new THREE.Mesh(

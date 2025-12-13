@@ -120,41 +120,44 @@ export const createEnvironment = (scene, materials) => {
 
   // Walls
   const wallGroup = new THREE.Group();
-  wallGroup.position.z = -2.0; 
+  wallGroup.position.z = -2.0; // Front wall plane
   
-  // Dimensions based on window frame bounds - adjusted to overlap frame slightly to prevent light leaks
   const roomWidth = 20;
-  const roomHeight = 3.5; 
-  const winBoundLeft = -2.08;  // Was -2.1
-  const winBoundRight = 2.08;  // Was 2.1
-  const winBoundTop = 2.82;    // Was 2.85
-  const winBoundBottom = 0.18; // Was 0.15
+  const floorY = -3.5;
+  const ceilingY = 3.5;
+  const fullHeight = 7.0; 
+  
+  // Window bounds
+  const winBoundLeft = -2.08;
+  const winBoundRight = 2.08;
+  const winBoundTop = 2.82;
+  const winBoundBottom = 0.18;
 
-  // Left Wall
+  // 1. Front Left Panel
   const leftW = (roomWidth / 2) + winBoundLeft; 
   const leftWall = new THREE.Mesh(
-    new THREE.BoxGeometry(leftW, roomHeight, 0.2),
+    new THREE.BoxGeometry(leftW, fullHeight, 0.2),
     wallMat
   );
-  leftWall.position.set(-10 + leftW/2, roomHeight/2, 0);
+  leftWall.position.set(-10 + leftW/2, 0, 0);
   leftWall.castShadow = true;
   leftWall.receiveShadow = true;
   wallGroup.add(leftWall);
 
-  // Right Wall
+  // 2. Front Right Panel
   const rightW = (roomWidth / 2) - winBoundRight;
   const rightWall = new THREE.Mesh(
-    new THREE.BoxGeometry(rightW, roomHeight, 0.2),
+    new THREE.BoxGeometry(rightW, fullHeight, 0.2),
     wallMat
   );
-  rightWall.position.set(10 - rightW/2, roomHeight/2, 0);
+  rightWall.position.set(10 - rightW/2, 0, 0);
   rightWall.castShadow = true;
   rightWall.receiveShadow = true;
   wallGroup.add(rightWall);
 
-  // Top Wall (Header)
+  // 3. Front Top Panel
   const midW = winBoundRight - winBoundLeft;
-  const topH = roomHeight - winBoundTop;
+  const topH = ceilingY - winBoundTop;
   if (topH > 0) {
     const topWall = new THREE.Mesh(
       new THREE.BoxGeometry(midW, topH, 0.2),
@@ -166,14 +169,14 @@ export const createEnvironment = (scene, materials) => {
     wallGroup.add(topWall);
   }
 
-  // Bottom Wall (Apron)
-  const botH = winBoundBottom;
+  // 4. Front Bottom Panel
+  const botH = winBoundBottom - floorY; 
   if (botH > 0) {
     const botWall = new THREE.Mesh(
       new THREE.BoxGeometry(midW, botH, 0.2),
       wallMat
     );
-    botWall.position.set(0, botH/2, 0);
+    botWall.position.set(0, floorY + botH/2, 0);
     botWall.castShadow = true;
     botWall.receiveShadow = true;
     wallGroup.add(botWall);
@@ -181,23 +184,48 @@ export const createEnvironment = (scene, materials) => {
 
   scene.add(wallGroup);
 
+  // Side & Back Walls
+  const roomDepth = 20;
+  const sideGeo = new THREE.BoxGeometry(0.2, fullHeight, roomDepth);
+  
+  // Left Wall
+  const sideLeft = new THREE.Mesh(sideGeo, wallMat);
+  sideLeft.position.set(-roomWidth/2, 0, -2 + roomDepth/2 - 0.1); 
+  sideLeft.receiveShadow = true;
+  scene.add(sideLeft);
+  
+  // Right Wall
+  const sideRight = new THREE.Mesh(sideGeo, wallMat);
+  sideRight.position.set(roomWidth/2, 0, -2 + roomDepth/2 - 0.1);
+  sideRight.receiveShadow = true;
+  scene.add(sideRight);
+  
+  // Back Wall
+  const backWall = new THREE.Mesh(
+      new THREE.BoxGeometry(roomWidth, fullHeight, 0.2),
+      wallMat
+  );
+  backWall.position.set(0, 0, -2 + roomDepth - 0.2); 
+  backWall.receiveShadow = true;
+  scene.add(backWall);
+
   // Ceiling
   const ceiling = new THREE.Mesh(
-    new THREE.PlaneGeometry(20, 20),
+    new THREE.PlaneGeometry(roomWidth, roomDepth + 2),
     ceilingMat
   );
   ceiling.rotation.x = Math.PI / 2;
-  ceiling.position.y = roomHeight;
+  ceiling.position.set(0, ceilingY, -2 + roomDepth/2);
   ceiling.receiveShadow = true;
   scene.add(ceiling);
 
   // Floor
   const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(20, 20),
+    new THREE.PlaneGeometry(roomWidth, roomDepth + 2),
     floorMat
   );
   floor.rotation.x = -Math.PI / 2;
-  floor.position.y = -3.5; 
+  floor.position.set(0, floorY, -2 + roomDepth/2); 
   floor.receiveShadow = true;
   scene.add(floor);
 

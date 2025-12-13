@@ -90,19 +90,19 @@ export const loadMaterials = () => {
     name: "glass",
     color: 0xffffff,
     metalness: 0.0,
-    roughness: 0.0,
-    transmission: 1.0, 
-    thickness: 0.1,    
-    ior: 1.5,          
-    envMapIntensity: 2.5, 
+    roughness: 0.02, // Subtle surface imperfection for specular hits
+    transmission: 0.98, 
+    thickness: 0.05,    
+    ior: 1.45,          
+    envMapIntensity: 3.0, // Strong reflections
     transparent: true,
     opacity: 1.0,
     side: THREE.DoubleSide,
     depthWrite: false, 
     clearcoat: 1.0,
     clearcoatRoughness: 0.0,
-    attenuationColor: 0xeafffe,
-    attenuationDistance: 0.2
+    attenuationColor: 0xffffff,
+    attenuationDistance: 0.5
   });
 
   const outdoorMat = new THREE.MeshBasicMaterial({
@@ -123,8 +123,10 @@ export const loadMaterials = () => {
   });
 
   const floorMat = new THREE.MeshStandardMaterial({
-    color: "#2a2a2a",
-    roughness: 0.7
+    color: "#333333",
+    roughness: 0.3, // Smoother for reflections
+    metalness: 0.1,
+    envMapIntensity: 0.8
   });
 
   return {

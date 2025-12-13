@@ -87,19 +87,22 @@ export const loadMaterials = () => {
   });
 
   const glassMat = new THREE.MeshPhysicalMaterial({
+    name: "glass",
     color: 0xffffff,
     metalness: 0.0,
-    roughness: 0.05,
-    transmission: 0.99, 
-    thickness: 0.05,    
-    ior: 1.52,          
-    envMapIntensity: 1.0, 
+    roughness: 0.0,
+    transmission: 1.0, 
+    thickness: 0.1,    
+    ior: 1.5,          
+    envMapIntensity: 2.5, 
     transparent: true,
     opacity: 1.0,
     side: THREE.DoubleSide,
     depthWrite: false, 
     clearcoat: 1.0,
-    clearcoatRoughness: 0.0
+    clearcoatRoughness: 0.0,
+    attenuationColor: 0xeafffe,
+    attenuationDistance: 0.2
   });
 
   const outdoorMat = new THREE.MeshBasicMaterial({

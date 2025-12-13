@@ -18,7 +18,7 @@ const createKitchenScene = (width, height, cubeRenderTarget) => {
   const { glass, outdoorView } = createEnvironment(scene, materials);
   if (cubeRenderTarget) {
     glass.material.envMap = cubeRenderTarget.texture;
-    glass.material.envMapIntensity = 1;
+    glass.material.envMapIntensity = 2.5;
   }
   createCounterAndSink(scene, materials);
   const { tipMesh } = createFaucet(scene, materials);

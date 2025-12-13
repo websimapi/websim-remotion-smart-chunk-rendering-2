@@ -5,9 +5,9 @@ export const setupLighting = (scene) => {
   scene.add(ambient);
 
   // Sunlight - RTX Quality Shadows
-  const sunLight = new THREE.DirectionalLight(0xfffdf2, 4.0); 
-  // Adjusted for better angle through window
-  sunLight.position.set(5, 8, -8); 
+  const sunLight = new THREE.DirectionalLight(0xfffaf0, 6.0); 
+  // Adjusted for better angle through window - Higher in the sky
+  sunLight.position.set(3, 12, -8); 
   sunLight.target.position.set(0, 0, 0); 
   sunLight.castShadow = true;
   

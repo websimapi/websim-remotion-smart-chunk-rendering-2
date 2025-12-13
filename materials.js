@@ -34,15 +34,15 @@ export const loadMaterials = () => {
     clearcoat: 0.5,
     clearcoatRoughness: 0.1,
     reflectivity: 0.5,
-    envMapIntensity: 0.3, // Reduced to darken shadows inside
+    envMapIntensity: 0.6, // Increased to pick up more ambient reflection
   });
 
   const metalMat = new THREE.MeshStandardMaterial({
     map: metal,
     metalness: 0.7,
-    roughness: 0.3, // Brushed look
+    roughness: 0.3, 
     color: "#aaaaaa",
-    envMapIntensity: 1.0, // Keep reflective
+    envMapIntensity: 1.0, 
   });
 
   const rimMat = new THREE.MeshStandardMaterial({
@@ -58,7 +58,7 @@ export const loadMaterials = () => {
     normalMap: drywallNormal,
     roughness: 0.8,
     color: "#ffffff",
-    envMapIntensity: 0.2, // Darken walls in shadow
+    envMapIntensity: 0.5, // Increased from 0.2 to brighten walls
   });
 
   const ceilingMat = new THREE.MeshStandardMaterial({
@@ -66,7 +66,7 @@ export const loadMaterials = () => {
     roughness: 0.9,
     metalness: 0.0,
     side: THREE.DoubleSide,
-    envMapIntensity: 0.2, // Darken ceiling
+    envMapIntensity: 0.5, // Increased from 0.2 to reduce darkness
   });
 
   const chromeMat = new THREE.MeshStandardMaterial({
@@ -120,14 +120,14 @@ export const loadMaterials = () => {
     color: "#f5f5f5", 
     roughness: 0.4,
     metalness: 0.1,
-    envMapIntensity: 0.25, // Significantly reduced to respect "dark inside" rule
+    envMapIntensity: 0.5, // Increased from 0.25 to blend better
   });
 
   const floorMat = new THREE.MeshStandardMaterial({
     color: "#333333",
-    roughness: 0.3, // Smoother for reflections
+    roughness: 0.3, 
     metalness: 0.1,
-    envMapIntensity: 0.2
+    envMapIntensity: 0.4
   });
 
   return {

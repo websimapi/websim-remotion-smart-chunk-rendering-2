@@ -1,35 +1,50 @@
 import * as THREE from "three";
 
 export const setupLighting = (scene) => {
-  // 1. Internal/Ambient Lights REMOVED
-  // We want the interior to start completely dark, lit only by the sun and bounce from outside.
-  
+  // 1. Hemisphere Light - "Room Fill"
+  // Simulates indirect lighting: Light bouncing off the floor (warm) and sky (cool)
+  // This solves the "pitch black shadows" issue by filling the room with ambient light
+  const hemiLight = new THREE.HemisphereLight(0xffffff, 0x8d7c6a, 0.6);
+  scene.add(hemiLight);
+
   // 2. Sunlight - Key Light
-  // Strong, directional sunlight entering through the window
-  const sunLight = new THREE.DirectionalLight(0xfffaf0, 15.0); // High intensity for realistic dynamic range
-  sunLight.position.set(3, 8, -12); // Positioned high and outside (behind window at z=-2)
-  sunLight.target.position.set(0, -1, 0); // Aimed at sink/counter area
+  // Directional sunlight entering through the window
+  const sunLight = new THREE.DirectionalLight(0xfff4e5, 5.0); // Slightly warmer, balanced intensity
+  sunLight.position.set(6, 6, -10); // Lower angle to cast longer rays into the room
+  sunLight.target.position.set(0, -1, 2); // Aim deeper into the kitchen
   sunLight.castShadow = true;
 
-  // High quality shadow settings for crisp window frame projection
+  // High quality shadow settings
   sunLight.shadow.mapSize.width = 4096; 
   sunLight.shadow.mapSize.height = 4096;
   sunLight.shadow.bias = -0.0001; 
   sunLight.shadow.normalBias = 0.02;
-  sunLight.shadow.radius = 1.5; // Slight softness for realism
+  sunLight.shadow.radius = 2.0; // Softens the shadow edges
   
   sunLight.shadow.camera.near = 1;
   sunLight.shadow.camera.far = 100;
-  sunLight.shadow.camera.left = -30;
-  sunLight.shadow.camera.right = 30;
-  sunLight.shadow.camera.top = 30;
-  sunLight.shadow.camera.bottom = -30;
+  sunLight.shadow.camera.left = -20;
+  sunLight.shadow.camera.right = 20;
+  sunLight.shadow.camera.top = 20;
+  sunLight.shadow.camera.bottom = -20;
   
   scene.add(sunLight);
   scene.add(sunLight.target);
 
-  // 3. Sky Fill REMOVED
-  // Removed artificial spot light to ensure only natural sun/sky light enters.
+  // 3. Window Fill (Sky Portal)
+  // Simulates diffuse skylight entering through the window frame
+  // This adds a soft, cool wash of light from the window direction, distinct from the sun beam
+  const windowFill = new THREE.SpotLight(0xddeeff, 12.0);
+  windowFill.position.set(0, 2.5, -2.0); // At the window
+  windowFill.target.position.set(0, 0, 5); // Pointing into the room
+  windowFill.angle = Math.PI / 1.5; // Very wide cone
+  windowFill.penumbra = 1.0; // Maximum softness
+  windowFill.decay = 1.5; // Physical falloff
+  windowFill.distance = 20;
+  windowFill.castShadow = false; // Purely for fill, saves performance
+  
+  scene.add(windowFill);
+  scene.add(windowFill.target);
 };
 
 export const createEnvironment = (scene, materials) => {

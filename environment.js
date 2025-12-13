@@ -1,50 +1,61 @@
 import * as THREE from "three";
 
 export const setupLighting = (scene) => {
-  const ambient = new THREE.AmbientLight(0x404040, 0.6); // Slightly brighter ambient
-  scene.add(ambient);
+  // 1. Hemisphere Light - Natural Ambient Gradient
+  // Replaces flat ambient light to fix "weird" shadows and provide base illumination
+  const hemiLight = new THREE.HemisphereLight(0xddeeff, 0x2a2a35, 1.0);
+  scene.add(hemiLight);
 
-  // Sunlight - RTX Quality Shadows
-  const sunLight = new THREE.DirectionalLight(0xfffaf0, 6.0); 
-  // Adjusted for better angle through window - Higher in the sky
-  sunLight.position.set(3, 12, -8); 
-  sunLight.target.position.set(0, 0, 0); 
+  // 2. Sunlight - Main Directional Source
+  // Positioned to stream through the window from outside
+  const sunLight = new THREE.DirectionalLight(0xfffaf0, 5.0); 
+  sunLight.position.set(4, 10, -10); 
+  sunLight.target.position.set(0, 0, 2); 
   sunLight.castShadow = true;
   
-  // High Resolution Shadows - Optimized for performance
-  sunLight.shadow.mapSize.width = 2048;
-  sunLight.shadow.mapSize.height = 2048;
-  sunLight.shadow.bias = -0.00005;
-  sunLight.shadow.normalBias = 0.02; 
-  sunLight.shadow.radius = 2; // Sharper shadows for "sunlight" feel
+  // RTX Quality Shadow Map settings
+  sunLight.shadow.mapSize.width = 4096;
+  sunLight.shadow.mapSize.height = 4096;
+  sunLight.shadow.bias = -0.0001;
+  sunLight.shadow.normalBias = 0.05; 
+  sunLight.shadow.radius = 2.5; // Soft natural edges
   
-  sunLight.shadow.camera.near = 1;
-  sunLight.shadow.camera.far = 30;
-  // Tighten shadow camera for sharper shadows
-  sunLight.shadow.camera.left = -8;
-  sunLight.shadow.camera.right = 8;
-  sunLight.shadow.camera.top = 8;
-  sunLight.shadow.camera.bottom = -8;
+  sunLight.shadow.camera.near = 0.5;
+  sunLight.shadow.camera.far = 50;
+  sunLight.shadow.camera.left = -10;
+  sunLight.shadow.camera.right = 10;
+  sunLight.shadow.camera.top = 10;
+  sunLight.shadow.camera.bottom = -10;
   scene.add(sunLight);
   scene.add(sunLight.target);
 
-  // Window Fill - Simulating Area Light
-  const windowFill = new THREE.SpotLight(0xcceeff, 4.0, 25, Math.PI / 2, 0.8, 1);
-  windowFill.position.set(0, 5, -4); 
-  windowFill.target.position.set(0, 0, 3);
-  // Add subtle shadow to fill light for grounding
+  // 3. Window Fill - Simulates Skylight Diffusion
+  // Broad, soft spotlight from the window frame
+  const windowFill = new THREE.SpotLight(0xcceeff, 10.0);
+  windowFill.position.set(0, 4, -2.5); 
+  windowFill.target.position.set(0, 1, 4); 
+  windowFill.angle = Math.PI / 1.5; // Very wide throw
+  windowFill.penumbra = 1.0; // Maximum softness
+  windowFill.decay = 2.0;
+  windowFill.distance = 25;
+  
   windowFill.castShadow = true;
-  windowFill.shadow.mapSize.width = 512;
-  windowFill.shadow.mapSize.height = 512;
+  windowFill.shadow.mapSize.width = 1024;
+  windowFill.shadow.mapSize.height = 1024;
   windowFill.shadow.bias = -0.0001;
-  windowFill.shadow.radius = 4; // Soft shadows
+  windowFill.shadow.radius = 8; // Extremely soft shadows for diffuse light
   scene.add(windowFill);
   scene.add(windowFill.target);
 
-  // Interior Ceiling Light - Warm top light
-  const ceilingLight = new THREE.PointLight(0xffeedd, 0.8, 15);
-  ceilingLight.position.set(0, 3.2, 3);
+  // 4. Interior Ceiling Light - "Smaller lighting effect"
+  // Localized warm glow, not overpowering the day light
+  const ceilingLight = new THREE.PointLight(0xffaa77, 3.0); 
+  ceilingLight.position.set(0, 3.2, 2);
+  ceilingLight.distance = 6; // Reduced range for localized effect
+  ceilingLight.decay = 2.5;
   ceilingLight.castShadow = true;
+  ceilingLight.shadow.mapSize.width = 512;
+  ceilingLight.shadow.mapSize.height = 512;
   ceilingLight.shadow.bias = -0.0001;
   scene.add(ceilingLight);
 };

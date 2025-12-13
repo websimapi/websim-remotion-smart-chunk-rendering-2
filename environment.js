@@ -10,9 +10,9 @@ export const setupLighting = (scene) => {
   sunLight.target.position.set(0, 0, 0); 
   sunLight.castShadow = true;
   
-  // High Resolution Shadows
-  sunLight.shadow.mapSize.width = 4096;
-  sunLight.shadow.mapSize.height = 4096;
+  // High Resolution Shadows - Optimized for performance
+  sunLight.shadow.mapSize.width = 2048;
+  sunLight.shadow.mapSize.height = 2048;
   sunLight.shadow.bias = -0.0001;
   sunLight.shadow.normalBias = 0.02; 
   sunLight.shadow.radius = 4; // Soft shadows

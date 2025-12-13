@@ -1,6 +1,6 @@
 import { jsxDEV } from "react/jsx-dev-runtime";
 import React, { useEffect, useRef, useState } from "react";
-import { useCurrentFrame, useVideoConfig, interpolate, Easing } from "remotion";
+import { useCurrentFrame, useVideoConfig, interpolate, Easing, delayRender, continueRender } from "remotion";
 import * as THREE from "three";
 import { loadMaterials } from "./materials.js";
 import { setupLighting, createEnvironment } from "./environment.js";
@@ -29,6 +29,7 @@ const KitchenSceneCanvas = () => {
   const cameraRef = useRef(null);
   const cubeCameraRef = useRef(null);
   const [ready, setReady] = useState(false);
+  const [handle] = useState(() => delayRender("Loading HDR Environment"));
   const frame = useCurrentFrame();
   const { durationInFrames, width, height, fps } = useVideoConfig();
   useEffect(() => {
@@ -54,12 +55,19 @@ const KitchenSceneCanvas = () => {
     const { scene, camera, waterSystem, faucetTip, glassMesh, outdoorMesh, materials } = createKitchenScene(width, height);
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     pmremGenerator.compileEquirectangularShader();
-    if (materials.hdrEnv) {
-      const envMap = pmremGenerator.fromEquirectangular(materials.hdrEnv).texture;
+    new THREE.TextureLoader().load("kitchen_hdr.png", (texture) => {
+      texture.mapping = THREE.EquirectangularReflectionMapping;
+      texture.colorSpace = THREE.SRGBColorSpace;
+      const envMap = pmremGenerator.fromEquirectangular(texture).texture;
       scene.environment = envMap;
-      scene.background = materials.hdrEnv;
+      scene.background = texture;
+      if (outdoorMesh.material) {
+        outdoorMesh.material.map = texture;
+        outdoorMesh.material.needsUpdate = true;
+      }
       pmremGenerator.dispose();
-    }
+      continueRender(handle);
+    });
     rendererRef.current = renderer;
     sceneRef.current = scene;
     cameraRef.current = camera;
@@ -112,7 +120,7 @@ const KitchenSceneCanvas = () => {
     false,
     {
       fileName: "<stdin>",
-      lineNumber: 154,
+      lineNumber: 167,
       columnNumber: 5
     }
   );
@@ -144,12 +152,18 @@ const KitchenSceneStandalone = () => {
     const { scene, camera, waterSystem, faucetTip, glassMesh, outdoorMesh, materials } = createKitchenScene(clientWidth, clientHeight);
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     pmremGenerator.compileEquirectangularShader();
-    if (materials.hdrEnv) {
-      const envMap = pmremGenerator.fromEquirectangular(materials.hdrEnv).texture;
+    new THREE.TextureLoader().load("kitchen_hdr.png", (texture) => {
+      texture.mapping = THREE.EquirectangularReflectionMapping;
+      texture.colorSpace = THREE.SRGBColorSpace;
+      const envMap = pmremGenerator.fromEquirectangular(texture).texture;
       scene.environment = envMap;
-      scene.background = materials.hdrEnv;
+      scene.background = texture;
+      if (outdoorMesh.material) {
+        outdoorMesh.material.map = texture;
+        outdoorMesh.material.needsUpdate = true;
+      }
       pmremGenerator.dispose();
-    }
+    });
     rendererRef.current = renderer;
     sceneRef.current = scene;
     cameraRef.current = camera;
@@ -220,7 +234,7 @@ const KitchenSceneStandalone = () => {
     false,
     {
       fileName: "<stdin>",
-      lineNumber: 288,
+      lineNumber: 311,
       columnNumber: 5
     }
   );

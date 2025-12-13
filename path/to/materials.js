@@ -90,14 +90,18 @@ export const loadMaterials = () => {
 
   const glassMat = new THREE.MeshPhysicalMaterial({
     color: 0xffffff,
-    metalness: 0.0,     
-    roughness: 0.0,    
-    transmission: 0.98, // Very clear
-    thickness: 0.05,     
-    ior: 1.52,           
-    envMapIntensity: 2.0, 
+    metalness: 0.0,
+    roughness: 0.0,
+    transmission: 1.0, // Fully transparent for realistic glass volume
+    thickness: 0.5,    // Optical thickness for refraction
+    ior: 1.52,         // Accurate glass Index of Refraction
+    envMapIntensity: 1.0,
     transparent: true,
     opacity: 1,
+    clearcoat: 1.0,    // High polish
+    clearcoatRoughness: 0.0,
+    attenuationColor: new THREE.Color(0xf0f8ff), // Subtle blue-ish tint for realism
+    attenuationDistance: 1.0,
     side: THREE.DoubleSide
   });
 

@@ -7,22 +7,22 @@ export const setupLighting = (scene) => {
   scene.add(hemiLight);
 
   // Sunlight - Adjusted for "RTX" look with soft shadows
-  const sunLight = new THREE.DirectionalLight(0xfff5e6, 4.0); 
-  sunLight.position.set(-5, 8, -6); // Optimized angle
-  sunLight.target.position.set(0, 0, 0); // Target sink center
+  const sunLight = new THREE.DirectionalLight(0xfff5e6, 5.0); 
+  sunLight.position.set(-3, 5, -8); // Optimized angle
+  sunLight.target.position.set(1, -0.5, 1); // Target sink center
   sunLight.castShadow = true;
   
   // High quality shadow settings
-  sunLight.shadow.mapSize.width = 2048; // Keeping 2048 for performance but tightening bounds
-  sunLight.shadow.mapSize.height = 2048;
+  sunLight.shadow.mapSize.width = 4096; // 4K shadows for RTX crispness
+  sunLight.shadow.mapSize.height = 4096;
   
   // Crucial for fixing "weird shadows" (acne vs peter-panning)
   sunLight.shadow.bias = -0.0001;
-  sunLight.shadow.normalBias = 0.03; 
-  sunLight.shadow.radius = 2.5; // Soften shadow edges
+  sunLight.shadow.normalBias = 0.02; 
+  sunLight.shadow.radius = 4; // PCF Soft Shadow blur radius for realistic penumbra
   
   // Tighten shadow camera to the relevant area (Sink & Counter) to maximize resolution
-  const d = 6;
+  const d = 8;
   sunLight.shadow.camera.left = -d;
   sunLight.shadow.camera.right = d;
   sunLight.shadow.camera.top = d;

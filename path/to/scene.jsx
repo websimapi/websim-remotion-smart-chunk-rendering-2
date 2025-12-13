@@ -54,9 +54,11 @@ const KitchenSceneCanvas = () => {
     canvas.style.width = "100%";
     canvas.style.height = "100%";
     const { scene, camera, waterSystem, faucetTip, glassMesh, outdoorMesh } = createKitchenScene(width, height);
-    const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(256, {
+    const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(512, {
       generateMipmaps: true,
-      minFilter: THREE.LinearMipmapLinearFilter
+      minFilter: THREE.LinearMipmapLinearFilter,
+      magFilter: THREE.LinearFilter
+      // Smoother scaling
     });
     const cubeCamera = new THREE.CubeCamera(0.1, 50, cubeRenderTarget);
     if (glassMesh) {
@@ -126,7 +128,7 @@ const KitchenSceneCanvas = () => {
     false,
     {
       fileName: "<stdin>",
-      lineNumber: 175,
+      lineNumber: 177,
       columnNumber: 5
     }
   );
@@ -154,7 +156,7 @@ const KitchenSceneStandalone = () => {
     canvas.style.width = "100%";
     canvas.style.height = "100%";
     const { scene, camera, waterSystem, faucetTip, glassMesh, outdoorMesh } = createKitchenScene(clientWidth, clientHeight);
-    const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(256, {
+    const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(512, {
       generateMipmaps: true,
       minFilter: THREE.LinearMipmapLinearFilter
     });
@@ -242,7 +244,7 @@ const KitchenSceneStandalone = () => {
     false,
     {
       fileName: "<stdin>",
-      lineNumber: 316,
+      lineNumber: 318,
       columnNumber: 5
     }
   );

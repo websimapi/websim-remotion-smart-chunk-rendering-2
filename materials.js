@@ -29,20 +29,20 @@ export const loadMaterials = () => {
 
   const counterMat = new THREE.MeshPhysicalMaterial({
     map: wood,
-    roughness: 0.3,
+    roughness: 0.25,
     metalness: 0.0,
-    clearcoat: 1.0,
+    clearcoat: 0.5,
     clearcoatRoughness: 0.1,
-    reflectivity: 1.0,
-    envMapIntensity: 1.0,
+    reflectivity: 0.5,
+    envMapIntensity: 1.2,
   });
 
   const metalMat = new THREE.MeshStandardMaterial({
     map: metal,
-    metalness: 0.9,
-    roughness: 0.2,
-    color: "#bbbbbb",
-    envMapIntensity: 1.0,
+    metalness: 0.7,
+    roughness: 0.3, // Brushed look
+    color: "#aaaaaa",
+    envMapIntensity: 1.5,
   });
 
   const rimMat = new THREE.MeshStandardMaterial({
@@ -88,17 +88,16 @@ export const loadMaterials = () => {
 
   const glassMat = new THREE.MeshPhysicalMaterial({
     color: 0xffffff,
-    metalness: 0.0,
-    roughness: 0.05,
-    transmission: 1.0,
-    thickness: 0.5,
-    ior: 1.52,
-    envMapIntensity: 1.0,
+    metalness: 0.1,
+    roughness: 0.0,
+    transmission: 0.98, // High transmission for clear glass
+    thickness: 0.02,    // Thin realistic glass pane
+    ior: 1.5,
+    envMapIntensity: 1.5, // Stronger reflections
     transparent: true,
     opacity: 1.0,
-    clearcoat: 1.0,
-    clearcoatRoughness: 0.0,
-    side: THREE.DoubleSide
+    side: THREE.DoubleSide,
+    depthWrite: false // Helps with transparency sorting
   });
 
   const outdoorMat = new THREE.MeshBasicMaterial({

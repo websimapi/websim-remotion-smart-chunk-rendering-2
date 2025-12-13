@@ -22,8 +22,8 @@ const getWaterTexture = () => {
 export const createWaterSystem = (scene) => {
   // 1. Main Stream - InstancedMesh for physical water appearance
   // Using a capsule/sphere shape that we'll stretch to simulate motion blur
-  const particleCount = 1500;
-  const geometry = new THREE.SphereGeometry(0.012, 8, 8);
+  const particleCount = 800; // Optimized for performance
+  const geometry = new THREE.SphereGeometry(0.012, 6, 6); // Lower poly
   
   const material = new THREE.MeshPhysicalMaterial({
     color: 0xddeeff,        // Slightly blue tint

@@ -56,17 +56,26 @@ const KitchenSceneCanvas = () => {
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     pmremGenerator.compileEquirectangularShader();
     new THREE.TextureLoader().load("kitchen_hdr.png", (texture) => {
+      if (!rendererRef.current) {
+        pmremGenerator.dispose();
+        return;
+      }
       texture.mapping = THREE.EquirectangularReflectionMapping;
       texture.colorSpace = THREE.SRGBColorSpace;
-      const envMap = pmremGenerator.fromEquirectangular(texture).texture;
-      scene.environment = envMap;
-      scene.background = texture;
-      if (outdoorMesh.material) {
-        outdoorMesh.material.map = texture;
-        outdoorMesh.material.needsUpdate = true;
+      try {
+        const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+        scene.environment = envMap;
+        scene.background = texture;
+        if (outdoorMesh.material) {
+          outdoorMesh.material.map = texture;
+          outdoorMesh.material.needsUpdate = true;
+        }
+      } catch (e) {
+        console.warn("PMREM generation failed", e);
+      } finally {
+        pmremGenerator.dispose();
+        continueRender(handle);
       }
-      pmremGenerator.dispose();
-      continueRender(handle);
     });
     rendererRef.current = renderer;
     sceneRef.current = scene;
@@ -120,7 +129,7 @@ const KitchenSceneCanvas = () => {
     false,
     {
       fileName: "<stdin>",
-      lineNumber: 167,
+      lineNumber: 177,
       columnNumber: 5
     }
   );
@@ -153,16 +162,25 @@ const KitchenSceneStandalone = () => {
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     pmremGenerator.compileEquirectangularShader();
     new THREE.TextureLoader().load("kitchen_hdr.png", (texture) => {
+      if (!rendererRef.current) {
+        pmremGenerator.dispose();
+        return;
+      }
       texture.mapping = THREE.EquirectangularReflectionMapping;
       texture.colorSpace = THREE.SRGBColorSpace;
-      const envMap = pmremGenerator.fromEquirectangular(texture).texture;
-      scene.environment = envMap;
-      scene.background = texture;
-      if (outdoorMesh.material) {
-        outdoorMesh.material.map = texture;
-        outdoorMesh.material.needsUpdate = true;
+      try {
+        const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+        scene.environment = envMap;
+        scene.background = texture;
+        if (outdoorMesh.material) {
+          outdoorMesh.material.map = texture;
+          outdoorMesh.material.needsUpdate = true;
+        }
+      } catch (e) {
+        console.warn("PMREM generation failed", e);
+      } finally {
+        pmremGenerator.dispose();
       }
-      pmremGenerator.dispose();
     });
     rendererRef.current = renderer;
     sceneRef.current = scene;
@@ -234,7 +252,7 @@ const KitchenSceneStandalone = () => {
     false,
     {
       fileName: "<stdin>",
-      lineNumber: 311,
+      lineNumber: 330,
       columnNumber: 5
     }
   );

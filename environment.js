@@ -5,17 +5,18 @@ export const setupLighting = (scene) => {
   scene.add(ambient);
 
   // Sunlight - RTX Quality Shadows
-  const sunLight = new THREE.DirectionalLight(0xfff5e6, 3.0); 
-  sunLight.position.set(-5, 8, -5); // Higher and side angle to match typical window light
+  const sunLight = new THREE.DirectionalLight(0xfffdf2, 4.5); 
+  // Positioned from the right-rear to cast shadows across the counter (matching Image 2)
+  sunLight.position.set(8, 6, -6); 
   sunLight.target.position.set(0, 0, 0); 
   sunLight.castShadow = true;
   
   // High Resolution Shadows - Optimized for performance
   sunLight.shadow.mapSize.width = 2048;
   sunLight.shadow.mapSize.height = 2048;
-  sunLight.shadow.bias = -0.0001;
-  sunLight.shadow.normalBias = 0.02; 
-  sunLight.shadow.radius = 4; // Soft shadows
+  sunLight.shadow.bias = -0.00005;
+  sunLight.shadow.normalBias = 0.01; 
+  sunLight.shadow.radius = 2; // Sharper shadows for "sunlight" feel
   
   sunLight.shadow.camera.near = 1;
   sunLight.shadow.camera.far = 30;

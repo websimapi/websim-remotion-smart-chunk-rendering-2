@@ -28,7 +28,8 @@ export const useRendering = (config, playerRef) => {
     const dest = ctx.createMediaStreamDestination();
 
     // Music
-    const music = new Audio("/api - Sink Battle - Sonauto.ogg");
+    const music = new Audio("/api%20-%20Sink%20Battle%20-%20Sonauto.ogg");
+    music.addEventListener("error", (e) => console.warn("Music load error", e));
     music.crossOrigin = "anonymous";
     music.preload = "auto";
     music.volume = 0.8; 

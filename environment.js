@@ -191,6 +191,6 @@ export const createEnvironment = (scene, materials) => {
   floor.receiveShadow = true;
   scene.add(floor);
 
-  return { glass };
+  return { glass, outdoorView };
 };
 

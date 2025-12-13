@@ -16,12 +16,12 @@ const createKitchenScene = (width, height) => {
   const materials = loadMaterials();
   scene.environment = materials.hdrEnv;
   setupLighting(scene);
-  const { glass } = createEnvironment(scene, materials);
+  const { glass, outdoorView } = createEnvironment(scene, materials);
   createCounterAndSink(scene, materials);
   const { tipMesh } = createFaucet(scene, materials);
   createDishes(scene, materials);
   const waterSystem = createWaterSystem(scene);
-  return { scene, camera, waterSystem, faucetTip: tipMesh, glassMesh: glass };
+  return { scene, camera, waterSystem, faucetTip: tipMesh, glassMesh: glass, outdoorMesh: outdoorView };
 };
 const KitchenSceneCanvas = () => {
   const containerRef = useRef(null);
@@ -51,7 +51,7 @@ const KitchenSceneCanvas = () => {
     renderer.shadowMap.bias = -5e-4;
     canvas.style.width = "100%";
     canvas.style.height = "100%";
-    const { scene, camera, waterSystem, faucetTip, glassMesh } = createKitchenScene(width, height);
+    const { scene, camera, waterSystem, faucetTip, glassMesh, outdoorMesh } = createKitchenScene(width, height);
     const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(256, {
       generateMipmaps: true,
       minFilter: THREE.LinearMipmapLinearFilter,
@@ -69,7 +69,7 @@ const KitchenSceneCanvas = () => {
     rendererRef.current = renderer;
     sceneRef.current = scene;
     cameraRef.current = camera;
-    scene.userData = { waterSystem, faucetTip, glassMesh };
+    scene.userData = { waterSystem, faucetTip, glassMesh, outdoorMesh };
     setReady(true);
     return () => {
       renderer.dispose();
@@ -104,7 +104,9 @@ const KitchenSceneCanvas = () => {
     }
     if (cubeCameraRef.current && glassMesh && renderer && frame % 2 === 0) {
       glassMesh.visible = false;
+      if (scene.userData.outdoorMesh) scene.userData.outdoorMesh.visible = false;
       cubeCameraRef.current.update(renderer, scene);
+      if (scene.userData.outdoorMesh) scene.userData.outdoorMesh.visible = true;
       glassMesh.visible = true;
     }
     renderer.render(scene, camera);
@@ -123,7 +125,7 @@ const KitchenSceneCanvas = () => {
     false,
     {
       fileName: "<stdin>",
-      lineNumber: 168,
+      lineNumber: 175,
       columnNumber: 5
     }
   );
@@ -150,7 +152,7 @@ const KitchenSceneStandalone = () => {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     canvas.style.width = "100%";
     canvas.style.height = "100%";
-    const { scene, camera, waterSystem, faucetTip, glassMesh } = createKitchenScene(clientWidth, clientHeight);
+    const { scene, camera, waterSystem, faucetTip, glassMesh, outdoorMesh } = createKitchenScene(clientWidth, clientHeight);
     const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(256, {
       generateMipmaps: true,
       minFilter: THREE.LinearMipmapLinearFilter
@@ -166,7 +168,7 @@ const KitchenSceneStandalone = () => {
     rendererRef.current = renderer;
     sceneRef.current = scene;
     cameraRef.current = camera;
-    scene.userData = { waterSystem, faucetTip, glassMesh };
+    scene.userData = { waterSystem, faucetTip, glassMesh, outdoorMesh };
     let animationFrameId;
     const fps = 30;
     const durationSec = 95;
@@ -194,7 +196,9 @@ const KitchenSceneStandalone = () => {
       }
       if (cubeCameraRef.current && glassMesh2 && frame % 2 === 0) {
         glassMesh2.visible = false;
+        if (scene2.userData.outdoorMesh) scene2.userData.outdoorMesh.visible = false;
         cubeCameraRef.current.update(renderer2, scene2);
+        if (scene2.userData.outdoorMesh) scene2.userData.outdoorMesh.visible = true;
         glassMesh2.visible = true;
       }
       renderer2.render(scene2, camera2);
@@ -238,7 +242,7 @@ const KitchenSceneStandalone = () => {
     false,
     {
       fileName: "<stdin>",
-      lineNumber: 306,
+      lineNumber: 317,
       columnNumber: 5
     }
   );

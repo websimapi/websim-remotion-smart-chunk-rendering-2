@@ -92,7 +92,7 @@ export const loadMaterials = () => {
     metalness: 0.1,     // Slight metalness for sharper reflections
     roughness: 0.02,    // Extremely smooth
     transmission: 0.90, // Reduced from 0.95 to make the glass volume more visible
-    thickness: 0.5,     // Increased thickness for better refraction
+    thickness: 0.1,     // Reduced from 0.5 to prevent distortion artifacts
     ior: 1.5,           
     envMapIntensity: 1.5, // Boosted reflections
     transparent: true,

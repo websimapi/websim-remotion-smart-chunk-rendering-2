@@ -29,20 +29,20 @@ export const loadMaterials = () => {
 
   const counterMat = new THREE.MeshPhysicalMaterial({
     map: wood,
-    roughness: 0.25,
+    roughness: 0.3,
     metalness: 0.0,
-    clearcoat: 0.5,
-    clearcoatRoughness: 0.1,
-    reflectivity: 0.5,
-    envMapIntensity: 0.6, // Increased to pick up more ambient reflection
+    clearcoat: 0.3,
+    clearcoatRoughness: 0.2,
+    reflectivity: 0.2,
+    envMapIntensity: 1.0, // Allow IBL to contribute more to the "baked" feel
   });
 
   const metalMat = new THREE.MeshStandardMaterial({
     map: metal,
-    metalness: 0.7,
-    roughness: 0.3, 
+    metalness: 0.8,
+    roughness: 0.2,
     color: "#aaaaaa",
-    envMapIntensity: 1.0, 
+    envMapIntensity: 1.5, // Strong reflections for metal
   });
 
   const rimMat = new THREE.MeshStandardMaterial({
@@ -50,23 +50,23 @@ export const loadMaterials = () => {
     metalness: 0.95,
     roughness: 0.15,
     color: "#dddddd",
-    envMapIntensity: 1.0,
+    envMapIntensity: 1.5,
   });
 
   const wallMat = new THREE.MeshStandardMaterial({
     map: drywall,
     normalMap: drywallNormal,
-    roughness: 0.8,
+    roughness: 0.9,
     color: "#ffffff",
-    envMapIntensity: 0.5, // Increased from 0.2 to brighten walls
+    envMapIntensity: 0.5, // Increased to pick up ambient room color
   });
 
   const ceilingMat = new THREE.MeshStandardMaterial({
-    color: "#dddddd",
-    roughness: 0.9,
+    color: "#eeeeee",
+    roughness: 1.0,
     metalness: 0.0,
     side: THREE.DoubleSide,
-    envMapIntensity: 0.5, // Increased from 0.2 to reduce darkness
+    envMapIntensity: 0.5, 
   });
 
   const chromeMat = new THREE.MeshStandardMaterial({
@@ -120,12 +120,12 @@ export const loadMaterials = () => {
     color: "#f5f5f5", 
     roughness: 0.4,
     metalness: 0.1,
-    envMapIntensity: 0.5, // Increased from 0.25 to blend better
+    envMapIntensity: 0.6,
   });
 
   const floorMat = new THREE.MeshStandardMaterial({
-    color: "#333333",
-    roughness: 0.3, 
+    color: "#2a2a2a",
+    roughness: 0.5, 
     metalness: 0.1,
     envMapIntensity: 0.4
   });

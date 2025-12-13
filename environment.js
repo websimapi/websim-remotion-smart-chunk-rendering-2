@@ -1,50 +1,50 @@
 import * as THREE from "three";
 
 export const setupLighting = (scene) => {
-  // 1. Hemisphere Light - "Room Fill"
-  // Simulates indirect lighting: Light bouncing off the floor (warm) and sky (cool)
-  // This solves the "pitch black shadows" issue by filling the room with ambient light
-  const hemiLight = new THREE.HemisphereLight(0xffffff, 0x8d7c6a, 0.6);
-  scene.add(hemiLight);
+  // To simulate "True Raytraced" lighting in rasterization:
+  // 1. Sun (Directional) -> The primary hard light source that casts defined shadows.
+  // 2. Window Portal (RectAreaLight) -> Simulates the sky emitting diffuse light through the window glass.
+  // 3. Global Illumination (Hemisphere) -> Simulates the average bounced light (brown from floor, blue from sky) to prevent pitch black shadows.
 
-  // 2. Sunlight - Key Light
-  // Directional sunlight entering through the window
-  const sunLight = new THREE.DirectionalLight(0xfff4e5, 5.0); // Slightly warmer, balanced intensity
-  sunLight.position.set(6, 6, -10); // Lower angle to cast longer rays into the room
-  sunLight.target.position.set(0, -1, 2); // Aim deeper into the kitchen
+  // --- 1. Sun Beam ---
+  const sunLight = new THREE.DirectionalLight(0xfff0dd, 8.0); // Warm sunlight
+  sunLight.position.set(5, 8, -10); // Outside, angled into the room
+  sunLight.target.position.set(0, -1, 2); // Hits the sink/floor area
   sunLight.castShadow = true;
 
-  // High quality shadow settings
-  sunLight.shadow.mapSize.width = 4096; 
+  // Optimized Shadow Map
+  sunLight.shadow.mapSize.width = 4096;
   sunLight.shadow.mapSize.height = 4096;
-  sunLight.shadow.bias = -0.0001; 
-  sunLight.shadow.normalBias = 0.02;
-  sunLight.shadow.radius = 2.0; // Softens the shadow edges
+  sunLight.shadow.bias = -0.00005;
+  sunLight.shadow.normalBias = 0.02; // Reduces shadow acne on curved surfaces
+  sunLight.shadow.radius = 2; // Soft edges (VSM-like appearance)
   
+  // Shadow Camera Frustum (Optimized to cover the kitchen)
   sunLight.shadow.camera.near = 1;
-  sunLight.shadow.camera.far = 100;
-  sunLight.shadow.camera.left = -20;
-  sunLight.shadow.camera.right = 20;
-  sunLight.shadow.camera.top = 20;
-  sunLight.shadow.camera.bottom = -20;
+  sunLight.shadow.camera.far = 50;
+  sunLight.shadow.camera.left = -10;
+  sunLight.shadow.camera.right = 10;
+  sunLight.shadow.camera.top = 10;
+  sunLight.shadow.camera.bottom = -10;
   
   scene.add(sunLight);
   scene.add(sunLight.target);
 
-  // 3. Window Fill (Sky Portal)
-  // Simulates diffuse skylight entering through the window frame
-  // This adds a soft, cool wash of light from the window direction, distinct from the sun beam
-  const windowFill = new THREE.SpotLight(0xddeeff, 12.0);
-  windowFill.position.set(0, 2.5, -2.0); // At the window
-  windowFill.target.position.set(0, 0, 5); // Pointing into the room
-  windowFill.angle = Math.PI / 1.5; // Very wide cone
-  windowFill.penumbra = 1.0; // Maximum softness
-  windowFill.decay = 1.5; // Physical falloff
-  windowFill.distance = 20;
-  windowFill.castShadow = false; // Purely for fill, saves performance
-  
-  scene.add(windowFill);
-  scene.add(windowFill.target);
+  // --- 2. Window Portal (Sky Diffuse) ---
+  // A rectangular area light placed exactly at the window frame.
+  // This mimics how the window itself acts as a light source for the room (soft shadows, realistic falloff).
+  const windowWidth = 4;
+  const windowHeight = 2.5;
+  const windowLight = new THREE.RectAreaLight(0xddeeff, 6.0, windowWidth, windowHeight);
+  windowLight.position.set(0, 1.5, -2.05); // Just inside the glass
+  windowLight.lookAt(0, 1.5, 5); // Pointing into the room
+  scene.add(windowLight);
+
+  // --- 3. Indirect Bounce (Fake GI) ---
+  // Simulates light bouncing off the warm wood floor (groundColor) and cool walls/sky (skyColor)
+  // This fills the pitch black shadows with realistic ambient levels.
+  const bounceLight = new THREE.HemisphereLight(0xffffff, 0x8d7159, 0.4);
+  scene.add(bounceLight);
 };
 
 export const createEnvironment = (scene, materials) => {

@@ -2,6 +2,7 @@ import { jsxDEV } from "react/jsx-dev-runtime";
 import React, { useEffect, useRef, useState } from "react";
 import { useCurrentFrame, useVideoConfig, interpolate, Easing, delayRender, continueRender } from "remotion";
 import * as THREE from "three";
+import { RectAreaLightUniformsLib } from "three/addons/lights/RectAreaLightUniformsLib.js";
 import { loadMaterials } from "./materials.js";
 import { setupLighting, createEnvironment } from "./environment.js";
 import { createCounterAndSink } from "./sink.js";
@@ -52,9 +53,10 @@ const KitchenSceneCanvas = () => {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1;
+    renderer.toneMappingExposure = 0.8;
     canvas.style.width = "100%";
     canvas.style.height = "100%";
+    RectAreaLightUniformsLib.init();
     const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(256, {
       generateMipmaps: true,
       minFilter: THREE.LinearMipmapLinearFilter,
@@ -144,7 +146,7 @@ const KitchenSceneCanvas = () => {
     false,
     {
       fileName: "<stdin>",
-      lineNumber: 204,
+      lineNumber: 208,
       columnNumber: 5
     }
   );
@@ -166,6 +168,7 @@ const KitchenSceneInteractive = () => {
       antialias: true,
       powerPreference: "high-performance"
     });
+    RectAreaLightUniformsLib.init();
     const w = containerRef.current.clientWidth;
     const h = containerRef.current.clientHeight;
     renderer.setPixelRatio(window.devicePixelRatio || 1);
@@ -344,7 +347,7 @@ const KitchenSceneInteractive = () => {
     false,
     {
       fileName: "<stdin>",
-      lineNumber: 419,
+      lineNumber: 425,
       columnNumber: 5
     }
   );

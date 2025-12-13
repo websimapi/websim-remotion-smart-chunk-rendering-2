@@ -24,9 +24,8 @@ export const loadMaterials = () => {
   const metal = loader.load("metal_scratch.png");
   const dirty = loader.load("dirty_plate_texture.png");
   const hdrEnv = loader.load("kitchen_hdr.png");
-  
-  // Environment Map for realistic reflections
   hdrEnv.mapping = THREE.EquirectangularReflectionMapping;
+  hdrEnv.colorSpace = THREE.SRGBColorSpace;
 
   const counterMat = new THREE.MeshPhysicalMaterial({
     map: wood,
@@ -89,15 +88,16 @@ export const loadMaterials = () => {
 
   const glassMat = new THREE.MeshPhysicalMaterial({
     color: 0xffffff,
-    metalness: 0.1,     // Slight metalness for sharper reflections
-    roughness: 0.02,    // Extremely smooth
-    transmission: 0.90, // Reduced from 0.95 to make the glass volume more visible
-    thickness: 0.1,     // Reduced from 0.5 to prevent distortion artifacts
-    ior: 1.5,           
-    envMapIntensity: 1.5, // Boosted reflections
+    metalness: 0.0,
+    roughness: 0.05,
+    transmission: 1.0,
+    thickness: 0.5,
+    ior: 1.52,
+    envMapIntensity: 1.0,
     transparent: true,
-    opacity: 1,
-    clearcoat: 1.0,     // Added clearcoat for extra shine
+    opacity: 1.0,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.0,
     side: THREE.DoubleSide
   });
 

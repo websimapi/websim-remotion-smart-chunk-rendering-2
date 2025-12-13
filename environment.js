@@ -4,16 +4,19 @@ export const setupLighting = (scene) => {
   const ambient = new THREE.AmbientLight(0x404040, 0.6); // Slightly brighter ambient
   scene.add(ambient);
 
-  // Sunlight - Adjusted to cast strong diagonal shadows through the window frames
-  // Positioned lower and more "behind" the window to throw shadows across the sink
-  const sunLight = new THREE.DirectionalLight(0xfff5e6, 5.0); 
-  sunLight.position.set(-3, 5, -8); // Moved further back (Z) and adjusted angle
-  sunLight.target.position.set(1, -0.5, 1); // Target the sink area
+  // Sunlight - RTX Quality Shadows
+  const sunLight = new THREE.DirectionalLight(0xfff5e6, 3.0); 
+  sunLight.position.set(-5, 8, -5); // Higher and side angle to match typical window light
+  sunLight.target.position.set(0, 0, 0); 
   sunLight.castShadow = true;
-  sunLight.shadow.mapSize.width = 2048;
-  sunLight.shadow.mapSize.height = 2048;
-  sunLight.shadow.bias = -0.0005;
+  
+  // High Resolution Shadows
+  sunLight.shadow.mapSize.width = 4096;
+  sunLight.shadow.mapSize.height = 4096;
+  sunLight.shadow.bias = -0.0001;
   sunLight.shadow.normalBias = 0.02; 
+  sunLight.shadow.radius = 4; // Soft shadows
+  
   sunLight.shadow.camera.near = 1;
   sunLight.shadow.camera.far = 30;
   // Tighten shadow camera for sharper shadows

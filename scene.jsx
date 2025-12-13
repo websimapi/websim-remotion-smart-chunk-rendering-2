@@ -14,14 +14,13 @@ const createKitchenScene = (width, height) => {
   const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
   camera.position.set(1, 0.5, 1);
   const materials = loadMaterials();
-  scene.environment = materials.hdrEnv;
   setupLighting(scene);
   const { glass, outdoorView } = createEnvironment(scene, materials);
   createCounterAndSink(scene, materials);
   const { tipMesh } = createFaucet(scene, materials);
   createDishes(scene, materials);
   const waterSystem = createWaterSystem(scene);
-  return { scene, camera, waterSystem, faucetTip: tipMesh, glassMesh: glass, outdoorMesh: outdoorView };
+  return { scene, camera, waterSystem, faucetTip: tipMesh, glassMesh: glass, outdoorMesh: outdoorView, materials };
 };
 const KitchenSceneCanvas = () => {
   const containerRef = useRef(null);
@@ -48,24 +47,19 @@ const KitchenSceneCanvas = () => {
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    renderer.shadowMap.bias = -5e-4;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
     canvas.style.width = "100%";
     canvas.style.height = "100%";
-    const { scene, camera, waterSystem, faucetTip, glassMesh, outdoorMesh } = createKitchenScene(width, height);
-    const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(256, {
-      generateMipmaps: true,
-      minFilter: THREE.LinearMipmapLinearFilter,
-      magFilter: THREE.LinearFilter
-    });
-    const cubeCamera = new THREE.CubeCamera(0.1, 50, cubeRenderTarget);
-    if (glassMesh) {
-      cubeCamera.position.copy(glassMesh.position);
-      glassMesh.material.envMap = cubeRenderTarget.texture;
-      glassMesh.material.envMapIntensity = 1.2;
-      glassMesh.material.needsUpdate = true;
+    const { scene, camera, waterSystem, faucetTip, glassMesh, outdoorMesh, materials } = createKitchenScene(width, height);
+    const pmremGenerator = new THREE.PMREMGenerator(renderer);
+    pmremGenerator.compileEquirectangularShader();
+    if (materials.hdrEnv) {
+      const envMap = pmremGenerator.fromEquirectangular(materials.hdrEnv).texture;
+      scene.environment = envMap;
+      scene.background = materials.hdrEnv;
+      pmremGenerator.dispose();
     }
-    scene.add(cubeCamera);
-    cubeCameraRef.current = cubeCamera;
     rendererRef.current = renderer;
     sceneRef.current = scene;
     cameraRef.current = camera;
@@ -102,13 +96,6 @@ const KitchenSceneCanvas = () => {
     if (waterSystem && faucetTip) {
       waterSystem.update(frame, fps, faucetTip);
     }
-    if (cubeCameraRef.current && glassMesh && renderer && frame % 2 === 0) {
-      glassMesh.visible = false;
-      if (scene.userData.outdoorMesh) scene.userData.outdoorMesh.visible = false;
-      cubeCameraRef.current.update(renderer, scene);
-      if (scene.userData.outdoorMesh) scene.userData.outdoorMesh.visible = true;
-      glassMesh.visible = true;
-    }
     renderer.render(scene, camera);
   }, [frame, durationInFrames, ready]);
   return /* @__PURE__ */ jsxDEV(
@@ -125,7 +112,7 @@ const KitchenSceneCanvas = () => {
     false,
     {
       fileName: "<stdin>",
-      lineNumber: 175,
+      lineNumber: 154,
       columnNumber: 5
     }
   );
@@ -150,21 +137,19 @@ const KitchenSceneStandalone = () => {
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
     canvas.style.width = "100%";
     canvas.style.height = "100%";
-    const { scene, camera, waterSystem, faucetTip, glassMesh, outdoorMesh } = createKitchenScene(clientWidth, clientHeight);
-    const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(256, {
-      generateMipmaps: true,
-      minFilter: THREE.LinearMipmapLinearFilter
-    });
-    const cubeCamera = new THREE.CubeCamera(0.1, 50, cubeRenderTarget);
-    if (glassMesh) {
-      cubeCamera.position.copy(glassMesh.position);
-      glassMesh.material.envMap = cubeRenderTarget.texture;
-      glassMesh.material.needsUpdate = true;
+    const { scene, camera, waterSystem, faucetTip, glassMesh, outdoorMesh, materials } = createKitchenScene(clientWidth, clientHeight);
+    const pmremGenerator = new THREE.PMREMGenerator(renderer);
+    pmremGenerator.compileEquirectangularShader();
+    if (materials.hdrEnv) {
+      const envMap = pmremGenerator.fromEquirectangular(materials.hdrEnv).texture;
+      scene.environment = envMap;
+      scene.background = materials.hdrEnv;
+      pmremGenerator.dispose();
     }
-    scene.add(cubeCamera);
-    cubeCameraRef.current = cubeCamera;
     rendererRef.current = renderer;
     sceneRef.current = scene;
     cameraRef.current = camera;
@@ -193,13 +178,6 @@ const KitchenSceneStandalone = () => {
       const { waterSystem: waterSystem2, faucetTip: faucetTip2, glassMesh: glassMesh2 } = scene2.userData;
       if (waterSystem2 && faucetTip2) {
         waterSystem2.update(frame, fps, faucetTip2);
-      }
-      if (cubeCameraRef.current && glassMesh2 && frame % 2 === 0) {
-        glassMesh2.visible = false;
-        if (scene2.userData.outdoorMesh) scene2.userData.outdoorMesh.visible = false;
-        cubeCameraRef.current.update(renderer2, scene2);
-        if (scene2.userData.outdoorMesh) scene2.userData.outdoorMesh.visible = true;
-        glassMesh2.visible = true;
       }
       renderer2.render(scene2, camera2);
       frame += 1;
@@ -242,7 +220,7 @@ const KitchenSceneStandalone = () => {
     false,
     {
       fileName: "<stdin>",
-      lineNumber: 317,
+      lineNumber: 288,
       columnNumber: 5
     }
   );

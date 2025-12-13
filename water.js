@@ -104,7 +104,7 @@ export const createWaterSystem = (scene) => {
       
       // Adjust start position to tip of nozzle (mesh origin is center of cylinder)
       // Moving slightly negative (into the mesh) prevents the visible gap
-      worldPos.addScaledVector(nozzleDir, -0.04);
+      worldPos.addScaledVector(nozzleDir, -0.08);
 
       const gravity = 9.8;
       const initialSpeed = 1.5; // Reduced speed to prevent excessive arcing

@@ -149,22 +149,27 @@ const KitchenSceneCanvas = () => {
     }
   );
 };
-const KitchenSceneStandalone = () => {
+const KitchenSceneInteractive = () => {
   const containerRef = useRef(null);
   const rendererRef = useRef(null);
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
+  const requestRef = useRef(null);
+  const keys = useRef({ w: false, a: false, s: false, d: false, space: false, shift: false });
+  const cameraRotation = useRef(new THREE.Euler(0, 0, 0, "YXZ"));
   useEffect(() => {
-    if (!containerRef.current || rendererRef.current) return;
-    const { clientWidth, clientHeight } = containerRef.current;
+    if (!containerRef.current) return;
     const canvas = document.createElement("canvas");
     containerRef.current.appendChild(canvas);
     const renderer = new THREE.WebGLRenderer({
       canvas,
-      antialias: true
+      antialias: true,
+      powerPreference: "high-performance"
     });
+    const w = containerRef.current.clientWidth;
+    const h = containerRef.current.clientHeight;
     renderer.setPixelRatio(window.devicePixelRatio || 1);
-    renderer.setSize(clientWidth, clientHeight, false);
+    renderer.setSize(w, h, false);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -179,8 +184,11 @@ const KitchenSceneStandalone = () => {
     });
     const cubeCamera = new THREE.CubeCamera(0.1, 100, cubeRenderTarget);
     cubeCamera.position.set(0, 1.5, -2);
-    const { scene, camera, waterSystem, faucetTip, glassMesh, outdoorMesh, materials } = createKitchenScene(clientWidth, clientHeight, cubeRenderTarget);
+    const { scene, camera, waterSystem, faucetTip, glassMesh, outdoorMesh } = createKitchenScene(w, h, cubeRenderTarget);
     scene.add(cubeCamera);
+    camera.position.set(3, 2, 6);
+    camera.lookAt(0, 0, 0);
+    cameraRotation.current.setFromQuaternion(camera.quaternion);
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     pmremGenerator.compileEquirectangularShader();
     new THREE.TextureLoader().load("kitchen_hdr.png", (texture) => {
@@ -210,58 +218,114 @@ const KitchenSceneStandalone = () => {
     rendererRef.current = renderer;
     sceneRef.current = scene;
     cameraRef.current = camera;
-    scene.userData = { waterSystem, faucetTip, glassMesh, outdoorMesh };
-    let animationFrameId;
-    const fps = 30;
-    const durationSec = 95;
-    const durationFrames = fps * durationSec;
-    let frame = 0;
-    const renderLoop = () => {
-      if (!rendererRef.current || !sceneRef.current || !cameraRef.current) return;
-      const renderer2 = rendererRef.current;
-      const scene2 = sceneRef.current;
-      const camera2 = cameraRef.current;
-      const t = durationFrames > 0 ? frame % durationFrames / durationFrames : 0;
-      const smoothT = t;
-      const x = interpolate(t, [0, 0.4, 1], [3, 1.5, -1.8]);
-      const y = interpolate(t, [0, 0.2, 1], [1.5, 3.5, 3]);
-      const z = interpolate(t, [0, 0.3, 1], [5.5, 7, 9]);
-      const lookX = 0;
-      const lookY = interpolate(t, [0, 1], [-0.35, -0.05]);
-      const lookZ = 0;
-      const shake = Math.sin(frame * 0.05) * 5e-3;
-      camera2.position.set(x, y + shake, z);
-      camera2.lookAt(lookX, lookY, lookZ);
-      const { waterSystem: waterSystem2, faucetTip: faucetTip2, glassMesh: glassMesh2 } = scene2.userData;
-      if (waterSystem2 && faucetTip2) {
-        waterSystem2.update(frame, fps, faucetTip2);
+    const onKeyDown = (e) => {
+      switch (e.code) {
+        case "KeyW":
+          keys.current.w = true;
+          break;
+        case "KeyA":
+          keys.current.a = true;
+          break;
+        case "KeyS":
+          keys.current.s = true;
+          break;
+        case "KeyD":
+          keys.current.d = true;
+          break;
+        case "Space":
+          keys.current.space = true;
+          break;
+        case "ShiftLeft":
+          keys.current.shift = true;
+          break;
       }
-      renderer2.render(scene2, camera2);
-      frame += 1;
-      animationFrameId = requestAnimationFrame(renderLoop);
     };
-    renderLoop();
-    const handleResize = () => {
-      if (!containerRef.current || !rendererRef.current || !cameraRef.current) return;
-      const { clientWidth: clientWidth2, clientHeight: clientHeight2 } = containerRef.current;
-      rendererRef.current.setSize(clientWidth2, clientHeight2, false);
-      cameraRef.current.aspect = clientWidth2 / clientHeight2;
+    const onKeyUp = (e) => {
+      switch (e.code) {
+        case "KeyW":
+          keys.current.w = false;
+          break;
+        case "KeyA":
+          keys.current.a = false;
+          break;
+        case "KeyS":
+          keys.current.s = false;
+          break;
+        case "KeyD":
+          keys.current.d = false;
+          break;
+        case "Space":
+          keys.current.space = false;
+          break;
+        case "ShiftLeft":
+          keys.current.shift = false;
+          break;
+      }
+    };
+    const onMouseMove = (e) => {
+      if (document.pointerLockElement === canvas) {
+        const sensitivity = 2e-3;
+        cameraRotation.current.y -= e.movementX * sensitivity;
+        cameraRotation.current.x -= e.movementY * sensitivity;
+        cameraRotation.current.x = Math.max(-Math.PI / 2 + 0.01, Math.min(Math.PI / 2 - 0.01, cameraRotation.current.x));
+        camera.quaternion.setFromEuler(cameraRotation.current);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
+    document.addEventListener("mousemove", onMouseMove);
+    const onClick = () => canvas.requestPointerLock();
+    canvas.addEventListener("click", onClick);
+    const onResize = () => {
+      if (!containerRef.current || !rendererRef.current) return;
+      const width = containerRef.current.clientWidth;
+      const height = containerRef.current.clientHeight;
+      rendererRef.current.setSize(width, height, false);
+      cameraRef.current.aspect = width / height;
       cameraRef.current.updateProjectionMatrix();
     };
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", onResize);
+    let lastTime = performance.now();
+    let virtualFrame = 0;
+    const simFps = 30;
+    const animate = () => {
+      const now = performance.now();
+      const delta = Math.min((now - lastTime) / 1e3, 0.1);
+      lastTime = now;
+      virtualFrame += delta * simFps;
+      if (document.pointerLockElement === canvas) {
+        const moveSpeed = 5 * delta;
+        const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+        forward.y = 0;
+        forward.normalize();
+        const right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
+        right.y = 0;
+        right.normalize();
+        if (keys.current.w) camera.position.addScaledVector(forward, moveSpeed);
+        if (keys.current.s) camera.position.addScaledVector(forward, -moveSpeed);
+        if (keys.current.d) camera.position.addScaledVector(right, moveSpeed);
+        if (keys.current.a) camera.position.addScaledVector(right, -moveSpeed);
+        if (keys.current.space) camera.position.y += moveSpeed;
+        if (keys.current.shift) camera.position.y -= moveSpeed;
+      }
+      if (waterSystem && faucetTip) {
+        waterSystem.update(virtualFrame, simFps, faucetTip);
+      }
+      renderer.render(scene, camera);
+      requestRef.current = requestAnimationFrame(animate);
+    };
+    animate();
     return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener("resize", handleResize);
-      if (rendererRef.current) {
-        rendererRef.current.dispose();
-      }
-      cubeRenderTarget.dispose();
-      if (canvas.parentNode) {
-        canvas.parentNode.removeChild(canvas);
-      }
-      rendererRef.current = null;
-      sceneRef.current = null;
-      cameraRef.current = null;
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
+      document.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("resize", onResize);
+      canvas.removeEventListener("click", onClick);
+      cancelAnimationFrame(requestRef.current);
+      if (rendererRef.current) rendererRef.current.dispose();
+      if (cubeRenderTarget) cubeRenderTarget.dispose();
+      if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
+      if (document.pointerLockElement === canvas) document.exitPointerLock();
     };
   }, []);
   return /* @__PURE__ */ jsxDEV(
@@ -271,19 +335,21 @@ const KitchenSceneStandalone = () => {
       style: {
         width: "100%",
         height: "100%",
-        overflow: "hidden"
-      }
+        cursor: "pointer",
+        position: "relative"
+      },
+      title: "Click to capture controls"
     },
     void 0,
     false,
     {
       fileName: "<stdin>",
-      lineNumber: 372,
+      lineNumber: 419,
       columnNumber: 5
     }
   );
 };
 export {
   KitchenSceneCanvas,
-  KitchenSceneStandalone
+  KitchenSceneInteractive
 };

@@ -7,6 +7,7 @@ import { styles } from "./styles.js";
 import { useRendering } from "./useRendering.js";
 import { DebugPanel } from "./DebugPanel.jsx";
 import { ChunkGrid } from "./ChunkGrid.jsx";
+import { KitchenSceneInteractive } from "./scene.jsx";
 const App = () => {
   const [showDebug, setShowDebug] = useState(false);
   const [config, setConfig] = useState({
@@ -38,17 +39,17 @@ const App = () => {
     showDebug && /* @__PURE__ */ jsxDEV("header", { style: styles.header, children: [
       /* @__PURE__ */ jsxDEV("h1", { style: styles.h1, children: "\u{1F3AC} Remotion Smart Chunk Manager" }, void 0, false, {
         fileName: "<stdin>",
-        lineNumber: 45,
+        lineNumber: 46,
         columnNumber: 11
       }),
       /* @__PURE__ */ jsxDEV("p", { style: styles.subtitle, children: "Optimized rendering pipeline for WebSim & Lambda" }, void 0, false, {
         fileName: "<stdin>",
-        lineNumber: 46,
+        lineNumber: 47,
         columnNumber: 11
       })
     ] }, void 0, true, {
       fileName: "<stdin>",
-      lineNumber: 44,
+      lineNumber: 45,
       columnNumber: 9
     }),
     /* @__PURE__ */ jsxDEV("div", { style: styles.grid, children: [
@@ -65,7 +66,7 @@ const App = () => {
         false,
         {
           fileName: "<stdin>",
-          lineNumber: 53,
+          lineNumber: 54,
           columnNumber: 11
         }
       ),
@@ -92,7 +93,7 @@ const App = () => {
         false,
         {
           fileName: "<stdin>",
-          lineNumber: 65,
+          lineNumber: 66,
           columnNumber: 13
         }
       ) : /* @__PURE__ */ jsxDEV("div", { style: {
@@ -107,11 +108,11 @@ const App = () => {
         color: "white"
       }, children: "Invalid Duration" }, void 0, false, {
         fileName: "<stdin>",
-        lineNumber: 83,
+        lineNumber: 84,
         columnNumber: 14
       }) }, void 0, false, {
         fileName: "<stdin>",
-        lineNumber: 63,
+        lineNumber: 64,
         columnNumber: 9
       }),
       showDebug && /* @__PURE__ */ jsxDEV(
@@ -125,23 +126,80 @@ const App = () => {
         false,
         {
           fileName: "<stdin>",
-          lineNumber: 95,
+          lineNumber: 96,
           columnNumber: 11
         }
-      )
+      ),
+      showDebug && /* @__PURE__ */ jsxDEV("div", { style: { ...styles.card, gridColumn: "1 / -1", height: "600px", display: "flex", flexDirection: "column" }, children: [
+        /* @__PURE__ */ jsxDEV("div", { style: { marginBottom: "20px" }, children: [
+          /* @__PURE__ */ jsxDEV("h2", { style: { marginBottom: "5px" }, children: "\u{1F579}\uFE0F Interactive Scene Preview" }, void 0, false, {
+            fileName: "<stdin>",
+            lineNumber: 107,
+            columnNumber: 15
+          }),
+          /* @__PURE__ */ jsxDEV("p", { style: { opacity: 0.8, fontSize: "14px" }, children: [
+            "Click inside to capture mouse control. ",
+            /* @__PURE__ */ jsxDEV("b", { children: "WASD" }, void 0, false, {
+              fileName: "<stdin>",
+              lineNumber: 109,
+              columnNumber: 56
+            }),
+            " to move, ",
+            /* @__PURE__ */ jsxDEV("b", { children: "Space/Shift" }, void 0, false, {
+              fileName: "<stdin>",
+              lineNumber: 109,
+              columnNumber: 77
+            }),
+            " to fly up/down, ",
+            /* @__PURE__ */ jsxDEV("b", { children: "Mouse" }, void 0, false, {
+              fileName: "<stdin>",
+              lineNumber: 109,
+              columnNumber: 112
+            }),
+            " to look. ",
+            /* @__PURE__ */ jsxDEV("b", { children: "ESC" }, void 0, false, {
+              fileName: "<stdin>",
+              lineNumber: 109,
+              columnNumber: 134
+            }),
+            " to release."
+          ] }, void 0, true, {
+            fileName: "<stdin>",
+            lineNumber: 108,
+            columnNumber: 15
+          })
+        ] }, void 0, true, {
+          fileName: "<stdin>",
+          lineNumber: 106,
+          columnNumber: 13
+        }),
+        /* @__PURE__ */ jsxDEV("div", { style: { flex: 1, width: "100%", borderRadius: "12px", overflow: "hidden", background: "#111" }, children: /* @__PURE__ */ jsxDEV(KitchenSceneInteractive, {}, void 0, false, {
+          fileName: "<stdin>",
+          lineNumber: 113,
+          columnNumber: 15
+        }) }, void 0, false, {
+          fileName: "<stdin>",
+          lineNumber: 112,
+          columnNumber: 13
+        })
+      ] }, void 0, true, {
+        fileName: "<stdin>",
+        lineNumber: 105,
+        columnNumber: 11
+      })
     ] }, void 0, true, {
       fileName: "<stdin>",
-      lineNumber: 50,
+      lineNumber: 51,
       columnNumber: 7
     })
   ] }, void 0, true, {
     fileName: "<stdin>",
-    lineNumber: 42,
+    lineNumber: 43,
     columnNumber: 5
   });
 };
 createRoot(document.getElementById("app")).render(/* @__PURE__ */ jsxDEV(App, {}, void 0, false, {
   fileName: "<stdin>",
-  lineNumber: 106,
+  lineNumber: 122,
   columnNumber: 51
 }));

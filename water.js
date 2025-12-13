@@ -26,15 +26,15 @@ export const createWaterSystem = (scene) => {
   const geometry = new THREE.SphereGeometry(0.012, 6, 6); // Lower poly
   
   const material = new THREE.MeshPhysicalMaterial({
-    color: 0xddeeff,        // Slightly blue tint
+    color: 0xffffff,        // Pure white, removed blue tint
     metalness: 0.1,
-    roughness: 0.05,        // Very smooth
-    transmission: 0.95,     // Glass-like transparency
-    thickness: 0.5,         // Volume simulation
-    ior: 1.33,              // Water Index of Refraction
-    envMapIntensity: 2.5,   // Strong reflections
+    roughness: 0.02,        
+    transmission: 0.98,     
+    thickness: 0.01,        // Reduced thickness to prevent absorption tinting
+    ior: 1.33,              
+    envMapIntensity: 2.0,   
     transparent: true,
-    opacity: 0.8,
+    opacity: 0.9,
   });
 
   const streamMesh = new THREE.InstancedMesh(geometry, material, particleCount);
@@ -52,7 +52,7 @@ export const createWaterSystem = (scene) => {
     size: 0.06,
     map: getWaterTexture(),
     transparent: true,
-    opacity: 0.4,
+    opacity: 0.3,
     depthWrite: false,
     blending: THREE.AdditiveBlending
   });

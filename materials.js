@@ -90,19 +90,15 @@ export const loadMaterials = () => {
     name: "glass",
     color: 0xffffff,
     metalness: 0.0,
-    roughness: 0.02, // Subtle surface imperfection for specular hits
-    transmission: 0.98, 
-    thickness: 0.05,    
-    ior: 1.45,          
-    envMapIntensity: 3.0, // Strong reflections
+    roughness: 0.0, 
+    transmission: 1.0, 
+    thickness: 0.0,     // Set to 0 to prevent physical absorption tinting
+    ior: 1.5,          
+    envMapIntensity: 2.0, 
     transparent: true,
     opacity: 1.0,
     side: THREE.DoubleSide,
     depthWrite: false, 
-    clearcoat: 1.0,
-    clearcoatRoughness: 0.0,
-    attenuationColor: 0xffffff,
-    attenuationDistance: 0.5
   });
 
   const outdoorMat = new THREE.MeshBasicMaterial({

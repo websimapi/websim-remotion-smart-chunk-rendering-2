@@ -2,15 +2,15 @@ import * as THREE from "three";
 
 export const setupLighting = (scene) => {
   // 1. Hemisphere Light - Atmosphere
-  // Cool sky, warm ground bounce
-  const hemiLight = new THREE.HemisphereLight(0xeef0ff, 0x443322, 0.6);
+  // Increased brightness and neutralized colors to fix "incorrect" baked look and dark shadows
+  const hemiLight = new THREE.HemisphereLight(0xffffff, 0x666666, 1.2);
   scene.add(hemiLight);
 
   // 2. Sunlight - Key Light
   // Strong, directional, casting hard shadows through the window
-  const sunLight = new THREE.DirectionalLight(0xfffaed, 4.0);
-  // Position: High and to the side, coming from "outside" (negative Z)
-  sunLight.position.set(6, 6, -8); 
+  const sunLight = new THREE.DirectionalLight(0xffffff, 3.5);
+  // Position: Higher up as requested (8, 10, -5) to simulate mid-day sun
+  sunLight.position.set(8, 10, -5); 
   // Target: Center of the kitchen floor area
   sunLight.target.position.set(-1, 0, 2);
   sunLight.castShadow = true;
@@ -34,9 +34,8 @@ export const setupLighting = (scene) => {
   scene.add(sunLight.target);
 
   // 3. Window Area Light (Simulated Bounce)
-  // Instead of a spotlight, we use a wide RectAreaLight-like effect via a soft point light
-  // This fills the room with the "sky" color near the window
-  const skyFill = new THREE.PointLight(0xddeeff, 1.5, 15);
+  // Changed from blue (0xddeeff) to white (0xffffff) to remove "blue glass effect"
+  const skyFill = new THREE.PointLight(0xffffff, 2.0, 15);
   skyFill.position.set(0, 2, -1);
   skyFill.decay = 2;
   scene.add(skyFill);

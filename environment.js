@@ -20,10 +20,10 @@ export const setupLighting = (scene) => {
   
   sunLight.shadow.camera.near = 1;
   sunLight.shadow.camera.far = 100;
-  sunLight.shadow.camera.left = -12;
-  sunLight.shadow.camera.right = 12;
-  sunLight.shadow.camera.top = 12;
-  sunLight.shadow.camera.bottom = -12;
+  sunLight.shadow.camera.left = -30;
+  sunLight.shadow.camera.right = 30;
+  sunLight.shadow.camera.top = 30;
+  sunLight.shadow.camera.bottom = -30;
   
   scene.add(sunLight);
   scene.add(sunLight.target);
@@ -179,12 +179,14 @@ export const createEnvironment = (scene, materials) => {
   const sideLeft = new THREE.Mesh(sideGeo, wallMat);
   sideLeft.position.set(-roomWidth/2, 0, -2 + roomDepth/2 - 0.1); 
   sideLeft.receiveShadow = true;
+  sideLeft.castShadow = true;
   scene.add(sideLeft);
   
   // Right Wall
   const sideRight = new THREE.Mesh(sideGeo, wallMat);
   sideRight.position.set(roomWidth/2, 0, -2 + roomDepth/2 - 0.1);
   sideRight.receiveShadow = true;
+  sideRight.castShadow = true;
   scene.add(sideRight);
   
   // Back Wall
@@ -194,16 +196,19 @@ export const createEnvironment = (scene, materials) => {
   );
   backWall.position.set(0, 0, -2 + roomDepth - 0.2); 
   backWall.receiveShadow = true;
+  backWall.castShadow = true;
   scene.add(backWall);
 
   // Ceiling
+  // Using BoxGeometry to ensure it blocks light from above effectively (casts shadows)
   const ceiling = new THREE.Mesh(
-    new THREE.PlaneGeometry(roomWidth, roomDepth + 2),
+    new THREE.BoxGeometry(roomWidth, 0.2, roomDepth + 2),
     ceilingMat
   );
-  ceiling.rotation.x = Math.PI / 2;
-  ceiling.position.set(0, ceilingY, -2 + roomDepth/2);
+  // ceiling.rotation.x = Math.PI / 2; // Not needed for Box, just position it
+  ceiling.position.set(0, ceilingY + 0.1, -2 + roomDepth/2);
   ceiling.receiveShadow = true;
+  ceiling.castShadow = true;
   scene.add(ceiling);
 
 

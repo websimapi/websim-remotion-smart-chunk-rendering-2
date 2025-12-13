@@ -5,9 +5,9 @@ export const setupLighting = (scene) => {
   scene.add(ambient);
 
   // Sunlight - RTX Quality Shadows
-  const sunLight = new THREE.DirectionalLight(0xfffdf2, 4.5); 
-  // Positioned from the right-rear to cast shadows across the counter (matching Image 2)
-  sunLight.position.set(8, 6, -6); 
+  const sunLight = new THREE.DirectionalLight(0xfffdf2, 4.0); 
+  // Adjusted for better angle through window
+  sunLight.position.set(5, 8, -8); 
   sunLight.target.position.set(0, 0, 0); 
   sunLight.castShadow = true;
   
@@ -15,7 +15,7 @@ export const setupLighting = (scene) => {
   sunLight.shadow.mapSize.width = 2048;
   sunLight.shadow.mapSize.height = 2048;
   sunLight.shadow.bias = -0.00005;
-  sunLight.shadow.normalBias = 0.01; 
+  sunLight.shadow.normalBias = 0.02; 
   sunLight.shadow.radius = 2; // Sharper shadows for "sunlight" feel
   
   sunLight.shadow.camera.near = 1;
@@ -28,15 +28,21 @@ export const setupLighting = (scene) => {
   scene.add(sunLight);
   scene.add(sunLight.target);
 
-  // Window Fill - Cool blue skylight fill
-  const windowFill = new THREE.SpotLight(0xcceeff, 2.5, 20, Math.PI / 3, 0.5, 1);
-  windowFill.position.set(0, 4, -3); 
-  windowFill.target.position.set(0, 0, 2);
+  // Window Fill - Simulating Area Light
+  const windowFill = new THREE.SpotLight(0xcceeff, 4.0, 25, Math.PI / 2, 0.8, 1);
+  windowFill.position.set(0, 5, -4); 
+  windowFill.target.position.set(0, 0, 3);
+  // Add subtle shadow to fill light for grounding
+  windowFill.castShadow = true;
+  windowFill.shadow.mapSize.width = 512;
+  windowFill.shadow.mapSize.height = 512;
+  windowFill.shadow.bias = -0.0001;
+  windowFill.shadow.radius = 4; // Soft shadows
   scene.add(windowFill);
   scene.add(windowFill.target);
 
   // Interior Ceiling Light - Warm top light
-  const ceilingLight = new THREE.PointLight(0xffeedd, 1.0, 12);
+  const ceilingLight = new THREE.PointLight(0xffeedd, 0.8, 15);
   ceilingLight.position.set(0, 3.2, 3);
   ceilingLight.castShadow = true;
   ceilingLight.shadow.bias = -0.0001;

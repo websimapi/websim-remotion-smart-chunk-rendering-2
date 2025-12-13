@@ -88,16 +88,18 @@ export const loadMaterials = () => {
 
   const glassMat = new THREE.MeshPhysicalMaterial({
     color: 0xffffff,
-    metalness: 0.1,
-    roughness: 0.0,
-    transmission: 0.98, // High transmission for clear glass
-    thickness: 0.02,    // Thin realistic glass pane
-    ior: 1.5,
-    envMapIntensity: 1.5, // Stronger reflections
+    metalness: 0.0,
+    roughness: 0.05,
+    transmission: 0.99, 
+    thickness: 0.05,    
+    ior: 1.52,          
+    envMapIntensity: 1.0, 
     transparent: true,
     opacity: 1.0,
     side: THREE.DoubleSide,
-    depthWrite: false // Helps with transparency sorting
+    depthWrite: false, 
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.0
   });
 
   const outdoorMat = new THREE.MeshBasicMaterial({
